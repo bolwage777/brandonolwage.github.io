@@ -1,0 +1,376 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Preppin Data: 2023 Week 1</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet"  href="/assets/css/portfolio.css"/>
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="/projects/preppindata/preppindata.html" class="logo">Back</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<!-- <li><a href="index.html">This is Massively</a></li> -->
+							<!-- <li class="active"><a href="generic.html">Generic Page</a></li>
+							<li><a href="elements.html">Elements Reference</a></li> -->
+						</ul>
+						<ul class="icons">
+							<li><a href="http://www.linkedin.com/in/brandonolwage" class="icon brands alt fa-linkedin"><span class="label">linkedin</span></a></li>
+							<li><a href="https://github.com/bolwage777/brandonolwage.github.io" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+									<h2>2023: Week 1<br/>The Data Source Bank</h2>
+								</header>
+								<p style="line-height: normal;">
+									<h3>Input</h3>
+									
+									The subject for this project will be our new (fake) bank -- The Data Source Bank (DSB). 
+									This week we have had a report with a number of transactions that have not just our transactions but other banks' too. 
+									Can you help clean up the data? <a href="https://preppindata.blogspot.com/2023/01/2023-week-1-data-source-bank.html">Preppin Data - Project Link</a>
+
+									
+								</p>
+								<p class="style-imgs">
+									<img src="/projects/preppindata/2023/Week 1/Screenshot RAW Data.png"/>
+								</p>
+								<p>
+									<h3>Requirements</h3>
+
+									<ul style="line-height: normal;">
+										<li>Input the data</li>
+										<li>Split the Transaction Code to extract the letters at the start of the transaction code. These identify the bank who processes the transaction.</li>
+										<li>Rename the new field with the Bank code 'Bank'.</li>
+										<li>Rename the values in the Online or In-person field, Online of the 1 values and In-Person for the 2 values.</li>
+										<li>Change the date to be the day of the week.</li>
+										<li>
+											Different levels of detail are required in the outputs. You will need to sum up the values of the transactions in three ways:
+											<ul>
+												<li>1. Total Values of Transactions by each bank.</li>
+												<li>2. Total Values by Bank, Day of the Week and Type of Transaction (Online or In-Person).</li>
+												<li>3. Total Values by Bank and Customer Code.</li>
+											</ul>
+										</li>
+										<li>Output each data file.</li>
+									</ul>
+								</p>
+								<p>
+									<h3>Output</h3>									
+									<div>
+										<p class="p_plain_format">
+											The first step was I created a Database called <mark>PreppinData</mark> in <mark>SQL</mark> to hold the data.
+											I then create a folder called <mark>UploadFolder</mark> to the <mark>CSV</mark> file in.
+											
+										</p>
+									</div>
+									<div>
+										<p class="p_format">
+											<mark class="mark-blue">USE</mark> PreppinData<br>
+											<mark class="mark-blue">DECLARE</mark> @output <mark class="mark-blue">INT</mark>
+										</p>										
+									</div>
+									<div>
+										<p class="p_plain_format">
+											The next step is to download the project <mark>CSV</mark> file and place it in the <mark>UploadFolder</mark>. Once the file is in the folder then
+											I then execute the line code to check if there is a file in the <mark>UploadFolder</mark> which will 
+											set the <mark>@output</mark> variable to <mark>0</mark>.
+										</p>
+									</div>
+									<div>
+										<p class="p_format">
+											<mark class="mark-blue">EXEC</mark> @<mark class="mark-blue">output</mark> = XP_CMDSHELL '<mark class="mark-grey">DIR "C:\UploadFolder\PD 2023 Wk 1 Input.csv" /B</mark>', NO_OUTPUT
+										</p>										
+									</div>
+									<div>
+										<p class="p_plain_format">
+											If the <mark>@output</mark> variable returns a 1 then a messaged will be returned saying that the <mark>Directory Empty</mark>.<br>
+											If the folder is not empty then I check to see if there is a table called <mark>Week1_2023_RAW</mark>, and if it exists then the table is
+											truncated using the SQL <mark>TRUNCATE TABLE</mark> command to clear all the data.<br>
+											If the table does not exist then I use the SQL <mark>CREATE TABLE</mark> command to create the table. It is important to note that I used the 
+											information outlined in the input provided above to create the columns shown below.<br>
+											Once the table is created I then used the SQL <mark>BULK INSERT</mark> command to insert the data into the table that was created in the previous step.
+										</p>
+									</div>
+									<div>
+										<p class="p_format">
+											<mark class="mark-blue">BEGIN</mark><br>
+												<mark class="mark-blue tab_20">IF</mark> @<mark class="mark-blue">output</mark> = 1<br>
+      												<mark class="mark-blue tab_40">PRINT</mark> <mark class="mark-grey">'Directory Empty'</mark><br>
+												<mark class="mark-blue tab_20">ELSE</mark><br>
+												<mark class="mark-green tab_40">-- Check if the table exists. If it does then truncate the data else create the table</mark><br>
+												<mark class="mark-blue tab_40">IF OBJECT_ID</mark>(N<mark class="mark-grey">'Week1_2023_RAW'</mark>, N<mark class="mark-grey">'U'</mark>) <mark class="mark-blue">IS NOT NULL</mark><br>
+													<mark class="mark-blue tab_60">TRUNCATE TABLE</mark> Week1_2023_RAW<br>
+												<mark class="mark-blue tab_40">ELSE</mark><br>
+													<mark class="mark-blue tab_60">CREATE TABLE</mark> dbo.Week1_2023_RAW(<br>
+														<mark class="tab_80">[Transaction Code]</mark> <mark class="mark-blue">NVARCHAR</mark>(<mark class="mark-orange">100</mark>)<br>
+														<mark class="tab_80">[Value]</mark> <mark class="mark-blue">VARCHAR</mark>(<mark class="mark-orange">50</mark>),<br>
+														<mark class="tab_80">[Customer Code]</mark> <mark class="mark-blue">VARCHAR</mark>(<mark class="mark-orange">50</mark>),<br>
+														<mark class="tab_80">[Online or In-Person]</mark> <mark class="mark-blue">VARCHAR</mark>(<mark class="mark-orange">50</mark>),<br>
+														<mark class="tab_80">[Transaction Date]</mark> <mark class="mark-blue">VARCHAR</mark>(<mark class="mark-orange">50)</mark><br>
+													<mark class="tab_60">)</mark><br>
+													<mark class="mark-green tab_40">-- Bulk Insert the data into created table</mark><br>
+													<mark class="mark-blue tab_40">BULK INSERT</mark> Week1_2023_RAW<br>
+													<mark class="mark-blue tab_40">FROM</mark> '<mark class="mark-grey">C:\UploadFolder\PD 2023 Wk 1 Input.csv</mark>'<br>
+													<mark class="mark-blue tab_40">WITH</mark> (<br>
+														<mark class="tab_60">FIELDTERMINATOR</mark> = <mark class="mark-grey">','</mark>,<br>
+														<mark class="tab_60">ROWTERMINATOR</mark> = <mark class="mark-grey">'0x0a'</mark>,<br>
+														<mark class="tab_60">FIRSTROW</mark> = <mark class="mark-orange">2</mark><br>
+														<mark class="tab_40">)</mark><br>
+											<mark class="mark-blue">END</mark>
+										</p>										
+									</div>
+									<div>
+										<p class="p_plain_format">
+											Because I am going be using a tempory table in the next few steps, I perform a SQL <mark>DROP TABLE</mark> command to make sure the
+											table does not exist before I insert any data into it.
+										</p>
+									</div>
+									<div>
+										<p class="p_format">
+											<mark class="mark-blue">DROP TABLE</mark> #Week1_Temp
+										</p>										
+									</div>
+									<div>
+										<p class="p_plain_format">
+											I now use the table <mark>Week1_2023_RAW</mark> to transform the data as per the requirement and insert it<br> into the <mark>#TEMP</mark> table.<br>
+											Next I create a new column to hold the bank code (extracted from the transaction code).<br>
+											I then remove the just the date portion and place it in a newly created. From this newly created date<br> column I create
+											a new column to hold the day of the week based on the date.<br>
+											Lastly I transform the Online or In-Person from an integer to text.
+										</p>
+									</div>
+									<div>
+										<p class="p_format">
+											<mark class="mark-blue">SELECT</mark><br> 
+												<mark class="tab_20">[Transaction Code],</mark><br>
+												<mark class="mark-blue tab_20">CONVERT</mark>(<mark class="mark-blue">MONEY</mark>,[Value]) <mark class="mark-blue">AS</mark> [Value],<br>
+												<mark class="mark-blue tab_20">CONVERT</mark>(<mark class="mark-blue">INT</mark>,[Customer Code]) <mark class="mark-blue">AS</mark> [Customer Code],<br>
+												<mark class="mark-blue tab_20">CASE WHEN CONVERT</mark>(<mark class="mark-blue">INT</mark>,[Online or In-Person]) = <mark class="mark-orange">1</mark> <br>
+												<mark class="mark-blue tab_40">THEN</mark> <mark class="mark-grey">'Online'</mark> <br>
+												<mark class="mark-blue tab_40">ELSE</mark> <mark class="mark-grey">'In-person'</mark> <br>
+												<mark class="mark-blue tab_20">END AS</mark> [Transaction Method],<br>
+												<mark class="mark-blue tab_20">SUBSTRING</mark>([Transaction Code], <mark class="mark-orange">0</mark>, <mark class="mark-blue">CHARINDEX</mark>('-', [Transaction Code])) <mark class="mark-blue">AS</mark> Bank,<br>
+												<mark class="mark-blue tab_20">CONVERT</mark>(<mark class="mark-blue">DATE</mark>, [Transaction Date], <mark class="mark-orange">103</mark>) <mark class="mark-blue">AS</mark> [Transaction Date],<br>
+												<mark class="mark-blue tab_20">DATENAME</mark>(WEEKDAY, <mark class="mark-blue">CONVERT</mark>(<mark class="mark-blue">DATE</mark>, [Transaction Date], <mark class="mark-orange">103</mark>)) <mark class="mark-blue">AS</mark> [Day of Week]<br>
+												<mark class="mark-blue">INTO</mark> <br>
+												<mark class="tab_20">#Week1_Temp</mark><br>
+												<mark class="mark-blue">FROM</mark><br> 
+												<mark class="tab_20">Week1_2023_RAW</mark>
+										</p>										
+									</div><div>
+										<p class="p_plain_format">
+											Now with the <mark>#TEMP</mark> created and the data transformed based on the requirement it is now time to create the reports.<br>
+											<br>
+											<b>1. Total Values of Transactions by each bank</b>
+										</p>
+									</div>
+									<div>
+										<p class="p_format">
+											<mark class="mark-blue">SELECT</mark><br>
+											<mark class="tab_20">Bank,</mark><br> 
+											<mark class="mark-blue tab_20">SUM</mark>([Value]) <mark class="mark-blue">AS</mark> [Bank Totals] <br>
+											<mark class="mark-blue">FROM</mark><br>
+											<mark class="tab_20">#Week1_Temp</mark><br>
+											<mark class="mark-blue">GROUP BY</mark><br>
+											<mark class="tab_20">Bank</mark>
+										</p>										
+									</div>
+									<div>
+										<p class="style-imgs">
+											<img src="/projects/preppindata/2023/Week 1/Screenshot Report 1 Output.png"/>
+										</p>
+									</div>
+									<div>
+										<p class="p_plain_format">
+											<b>2. Total Values by Bank, Day of the Week and Type of Transaction (Online or In-Person)</b>
+										</p>
+									</div>
+									<div>
+										<p class="p_format">
+											<mark class="mark-blue">SELECT</mark><br>
+											<mark class="tab_20">Bank,</mark><br> 
+											<mark class="tab_20">[Day of Week],</mark><br> 
+											<mark class="tab_20">[Transaction Method],</mark><br> 
+											<mark class="mark-blue tab_20">SUM</mark>([Value]) <mark class="mark-blue">AS</mark> Totals<br>
+											<mark class="mark-blue">FROM</mark><br>
+											<mark class="tab_20"></mark>#Week1_Temp</mark><br>
+											<mark class="mark-blue">GROUP BY</mark><br>
+											<mark class="tab_20">Bank, [Day of Week], [Transaction Method]</mark>
+										</p>										
+									</div>
+									<div>
+										<p class="style-imgs">
+											<img src="/projects/preppindata/2023/Week 1/Screenshot Report 2 Output.png"/>
+										</p>
+									</div>
+									<div>
+										<p class="p_plain_format">
+											<b>3. Total Values by Bank and Customer Code</b>
+										</p>
+									</div>
+									<div>
+										<p class="p_format">
+											<mark class="mark-blue">SELECT</mark><br> 
+											<mark class="tab_20"></mark>Bank,<br> 
+											<mark class="tab_20"></mark>[Day of Week],<br> 
+											<mark class="tab_20"></mark>[Transaction Method],<br> 
+											<mark class="mark-blue tab_20">SUM</mark>([Value]) <mark class="mark-blue">AS</mark> Totals<br>
+											<mark class="mark-blue">FROM</mark><br>
+											<mark class="tab_20">#Week1_Temp</mark><br>
+											<mark class="mark-blue">GROUP BY</mark><br> 
+											<mark class="tab_20">Bank, [Day of Week], [Transaction Method]</mark>
+										</p>										
+									</div>
+									<div>
+										<p class="style-imgs">
+											<img src="/projects/preppindata/2023/Week 1/Screenshot Report 3 Output.png"/>
+										</p>
+									</div>
+									<div>
+										<p class="p_plain_format">
+											Below is the full script file for this project.
+										</p>
+									</div>
+									<div>
+										<p class="p_format">
+											<mark class="mark-blue">USE</mark> PreppinData<br>
+											<mark class="mark-blue">DECLARE</mark> @output <mark class="mark-blue">INT</mark><br><br>
+											
+											<mark class="mark-blue">EXEC</mark> @<mark class="mark-blue">output</mark> = XP_CMDSHELL '<mark class="mark-grey">DIR "C:\UploadFolder\PD 2023 Wk 1 Input.csv" /B</mark>', NO_OUTPUT<br><br>
+											
+											<mark class="mark-blue">BEGIN</mark><br>
+											<mark class="mark-blue tab_20">IF</mark> @<mark class="mark-blue">output</mark> = 1<br>
+      										<mark class="mark-blue tab_40">PRINT</mark> <mark class="mark-grey">'Directory Empty'</mark><br>
+											<mark class="mark-blue tab_20">ELSE</mark><br>
+											<mark class="mark-green tab_40">-- Check if the table exists. If it does then truncate the data else create the table</mark><br>
+											<mark class="mark-blue tab_40">IF OBJECT_ID</mark>(N<mark class="mark-grey">'Week1_2023_RAW'</mark>, N<mark class="mark-grey">'U'</mark>) <mark class="mark-blue">IS NOT NULL</mark><br>
+											<mark class="mark-blue tab_60">TRUNCATE TABLE</mark> Week1_2023_RAW<br>
+											<mark class="mark-blue tab_40">ELSE</mark><br>
+											<mark class="mark-blue tab_60">CREATE TABLE</mark> dbo.Week1_2023_RAW(<br>
+											<mark class="tab_80">[Transaction Code]</mark> <mark class="mark-blue">NVARCHAR</mark>(<mark class="mark-orange">100</mark>)<br>
+											<mark class="tab_80">[Value]</mark> <mark class="mark-blue">VARCHAR</mark>(<mark class="mark-orange">50</mark>),<br>
+											<mark class="tab_80">[Customer Code]</mark> <mark class="mark-blue">VARCHAR</mark>(<mark class="mark-orange">50</mark>),<br>
+											<mark class="tab_80">[Online or In-Person]</mark> <mark class="mark-blue">VARCHAR</mark>(<mark class="mark-orange">50</mark>),<br>
+											<mark class="tab_80">[Transaction Date]</mark> <mark class="mark-blue">VARCHAR</mark>(<mark class="mark-orange">50)</mark><br>
+											<mark class="tab_60">)</mark><br>
+											
+											<mark class="mark-green tab_40">-- Bulk Insert the data into created table</mark><br>
+											<mark class="mark-blue tab_40">BULK INSERT</mark><br> 
+											<mark class="tab_60">Week1_2023_RAW</mark><br>
+											<mark class="mark-blue tab_40">FROM</mark><br>
+											<mark class="tab_60">'<mark class="mark-grey">C:\UploadFolder\PD 2023 Wk 1 Input.csv</mark>'</mark><br>
+											<mark class="mark-blue tab_40">WITH</mark> (<br>
+											<mark class="tab_60">FIELDTERMINATOR</mark> = <mark class="mark-grey">','</mark>,<br>
+											<mark class="tab_60">ROWTERMINATOR</mark> = <mark class="mark-grey">'0x0a'</mark>,<br>
+											<mark class="tab_60">FIRSTROW</mark> = <mark class="mark-orange">2</mark><br>
+											<mark class="tab_40">)</mark><br>
+											<mark class="mark-blue">END</mark><br><br>
+											
+											<mark class="mark-green">-- If the temp table exists then drop the table</mark><br>
+											<mark class="mark-blue">DROP TABLE</mark> #Week1_Temp<br><br>
+											
+											<mark class="mark-green">-- Select from the Data that was inserted in the Bulk Insert.<br> 
+											--	Transform the data and insert it into a #TEMP table.<br>
+											-- Create a new column to hold the bank code (extracted from the transaction code).<br>
+											-- Create a new column to use only the date, create a new column to hold the <br>-- day of the week based on the date.<br>
+											-- Transform the Online or In-Person from an integer to text</mark><br>
+											<mark class="mark-blue">SELECT</mark><br> 
+											<mark class="tab_20">[Transaction Code],</mark><br>
+											<mark class="mark-blue tab_20">CONVERT</mark>(<mark class="mark-blue">MONEY</mark>,[Value]) <mark class="mark-blue">AS</mark> [Value],<br>
+											<mark class="mark-blue tab_20">CONVERT</mark>(<mark class="mark-blue">INT</mark>,[Customer Code]) <mark class="mark-blue">AS</mark> [Customer Code],<br>
+											<mark class="mark-blue tab_20">CASE WHEN CONVERT</mark>(<mark class="mark-blue">INT</mark>,[Online or In-Person]) = <mark class="mark-orange">1</mark> <br>
+											<mark class="mark-blue tab_40">THEN</mark> <mark class="mark-grey">'Online'</mark> <br>
+											<mark class="mark-blue tab_40">ELSE</mark> <mark class="mark-grey">'In-person'</mark> <br>
+											<mark class="mark-blue tab_20">END AS</mark> [Transaction Method],<br>
+											<mark class="mark-blue tab_20">SUBSTRING</mark>([Transaction Code], <mark class="mark-orange">0</mark>, <mark class="mark-blue">CHARINDEX</mark>('-', [Transaction Code])) <mark class="mark-blue">AS</mark> Bank,<br>
+											<mark class="mark-blue tab_20">CONVERT</mark>(<mark class="mark-blue">DATE</mark>, [Transaction Date], <mark class="mark-orange">103</mark>) <mark class="mark-blue">AS</mark> [Transaction Date],<br>
+											<mark class="mark-blue tab_20">DATENAME</mark>(WEEKDAY, <mark class="mark-blue">CONVERT</mark>(<mark class="mark-blue">DATE</mark>, [Transaction Date], <mark class="mark-orange">103</mark>)) <mark class="mark-blue">AS</mark> [Day of Week]<br>
+											<mark class="mark-blue">INTO</mark> <br>
+											<mark class="tab_20">#Week1_Temp</mark><br>
+											<mark class="mark-blue">FROM</mark><br> 
+											<mark class="tab_20">Week1_2023_RAW</mark><br><br>
+											
+											<mark class="mark-green">-- Reports required from the data
+											-- 1. Total Values of Transactions by each bank.</mark><br>
+											<mark class="mark-blue">SELECT</mark><br>
+											<mark class="tab_20">Bank,</mark><br> 
+											<mark class="mark-blue tab_20">SUM</mark>([Value]) <mark class="mark-blue">AS</mark> [Bank Totals] <br>
+											<mark class="mark-blue">FROM</mark><br>
+											<mark class="tab_20">#Week1_Temp</mark><br>
+											<mark class="mark-blue">GROUP BY</mark><br>
+											<mark class="tab_20">Bank</mark><br><br>
+
+											<mark class="mark-green">-- 2. Total Values by Bank, Day of the Week and Type of Transaction (Online or In-Person)</mark><br>
+											<mark class="mark-blue">SELECT</mark><br>
+											<mark class="tab_20">Bank,</mark><br> 
+											<mark class="tab_20">[Day of Week],</mark><br> 
+											<mark class="tab_20">[Transaction Method],</mark><br> 
+											<mark class="mark-blue tab_20">SUM</mark>([Value]) <mark class="mark-blue">AS</mark> Totals<br>
+											<mark class="mark-blue">FROM</mark><br>
+											<mark class="tab_20"></mark>#Week1_Temp</mark><br>
+											<mark class="mark-blue">GROUP BY</mark><br>
+											<mark class="tab_20">Bank, [Day of Week], [Transaction Method]</mark><br><br>
+
+											<mark class="mark-green">-- 3. Total Values by Bank and Customer Code.</mark><br>
+											<mark class="mark-blue">SELECT</mark><br> 
+											<mark class="tab_20"></mark>Bank,<br> 
+											<mark class="tab_20"></mark>[Day of Week],<br> 
+											<mark class="tab_20"></mark>[Transaction Method],<br> 
+											<mark class="mark-blue tab_20">SUM</mark>([Value]) <mark class="mark-blue">AS</mark> Totals<br>
+											<mark class="mark-blue">FROM</mark><br>
+											<mark class="tab_20">#Week1_Temp</mark><br>
+											<mark class="mark-blue">GROUP BY</mark><br> 
+											<mark class="tab_20">Bank, [Day of Week], [Transaction Method]</mark>
+										</p>										
+									</div>
+									<div>
+										<p class="p_plain_format">
+											That is the end of this project.<br>
+											If you have any questions or comments pertaining to this project then please email me @<a href="#">bolwage777@gmail.com</a>
+										</p>
+									</div>
+								</p>
+							</section>
+					</div>
+
+				
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Preppin Data: 2023 Week 1</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
